@@ -39,7 +39,7 @@ result = benchmark_cuda_event(
     num_active_runs=100,
 )
 
-print(f"Duration: {result.avg/1e3:.5f} ms ± {result.error:.2f} μs")
+print(f"Duration: {result}")
 ```
 
 ## API

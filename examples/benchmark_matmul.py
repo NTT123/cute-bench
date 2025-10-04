@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     print("Profiler results:")
     for kernel_name, measurement in results.items():
-        print(f"  {kernel_name}: {measurement.avg/1e3:.5f} ms ± {measurement.error:.2f} μs")
+        print(f"  {kernel_name}: {measurement}")
 
     # Benchmark with cuda events
     result = benchmark_cuda_event(
@@ -38,4 +38,4 @@ if __name__ == "__main__":
     )
 
     print(f"\nCUDA Event result:")
-    print(f"  {result.avg/1e3:.5f} ms ± {result.error:.2f} μs")
+    print(f"  {result}")
