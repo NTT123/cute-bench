@@ -26,6 +26,7 @@ results = benchmark(
     workspace_generator=generate_workspace,
     num_warmup_runs=1000,
     num_active_runs=100,
+    num_workspaces=50,
 )
 
 for kernel_name, measurement in results.items():
@@ -37,6 +38,7 @@ result = benchmark_cuda_event(
     workspace_generator=generate_workspace,
     num_warmup_runs=1000,
     num_active_runs=100,
+    num_workspaces=50,
 )
 
 print(f"Duration: {result}")
