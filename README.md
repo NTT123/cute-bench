@@ -47,9 +47,6 @@ print(f"Duration: {result}")
 # matmul 4096x4096x4096
 #   torch.profiler  :  9.2795 ms ± 1.31 μs
 #   CUDA event      :  9.2842 ms ± 1.40 μs
-# matmul 128x128x128
-#   torch.profiler  :  8.738 μs ± 18.0 ns
-#   CUDA event      : 31.9   μs ± 1.77 μs
 ```
 
 ![Benchmark Results](examples/matmul_benchmark.png)
