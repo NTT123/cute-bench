@@ -148,7 +148,7 @@ def benchmark(fn, workspace_generator, num_warmup_runs=1000, num_active_runs=50,
 
 def benchmark_cuda_event(fn, workspace_generator, num_warmup_runs=1000,
                          num_active_runs=50, num_workspaces=50,
-                         lock_clocks=True, device_index=0):
+                         lock_clocks=True, device_index=0, num_blocked_cycles=1_000_000):
     """
     Benchmark using torch.cuda.Event.
 
@@ -160,6 +160,8 @@ def benchmark_cuda_event(fn, workspace_generator, num_warmup_runs=1000,
         num_workspaces: Pre-generated workspaces to cycle through
         lock_clocks: Whether to lock GPU clocks
         device_index: GPU device index
+        num_blocked_cycles: Number of cycles to block GPU before recording start event
+                           (prevents CPU-side launch delay gaps)
 
     Returns:
         KernelMeasurement: Timing measurements
@@ -174,6 +176,7 @@ def benchmark_cuda_event(fn, workspace_generator, num_warmup_runs=1000,
 
         for i in range(N):
             workspace = workspaces[i % num_workspaces]
+            torch.cuda._sleep(num_blocked_cycles)
             start_events[i].record()
             fn(*workspace)
             end_events[i].record()

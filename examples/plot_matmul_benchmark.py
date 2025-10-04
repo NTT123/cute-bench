@@ -73,6 +73,7 @@ for n in sizes:
         num_warmup_runs=num_warmup,
         num_active_runs=num_active,
         num_workspaces=1000,
+        num_blocked_cycles=1_000_000,
     )
 
     cuda_event_avgs.append(result.avg / 1e3)  # Convert μs to ms
@@ -96,18 +97,11 @@ plt.errorbar(sizes, profiler_avgs, yerr=profiler_errors,
 plt.errorbar(sizes, cuda_event_avgs, yerr=cuda_event_errors,
                 marker='s', label='CUDA event', capsize=5, linewidth=2)
 
-plt.xscale('log')
-plt.yscale('log')
 plt.xlabel('Matrix Size (n×n×n)')
 plt.ylabel('Time (ms)')
 plt.title(f'Matrix Multiplication Benchmark - {device_name}')
 plt.legend()
 plt.grid(True, alpha=0.3)
-
-# Custom y-axis ticks at 2us, 5us, 10us, 30us, 150us
-ytick_values = [0.002, 0.005, 0.01, 0.03, 0.15]  # in ms
-ytick_labels = ['2 μs', '5 μs', '10 μs', '30 μs', '150 μs']
-plt.yticks(ytick_values, ytick_labels)
 
 # Save plot
 plt.savefig('matmul_benchmark.png', dpi=150, bbox_inches='tight')

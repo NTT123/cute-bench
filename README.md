@@ -74,7 +74,14 @@ Returns: `dict[str, KernelMeasurement]`
 
 Benchmark using torch.cuda.Event. Returns single timing measurement.
 
-Same parameters as `benchmark()`.
+- `fn`: Function to benchmark
+- `workspace_generator`: Function that generates workspace data
+- `num_warmup_runs`: Warmup iterations (default: 1000)
+- `num_active_runs`: Measured iterations (default: 50)
+- `num_workspaces`: Pre-generated workspaces (default: 50)
+- `lock_clocks`: Lock GPU clocks (default: True)
+- `device_index`: GPU device index (default: 0)
+- `num_blocked_cycles`: GPU sleep cycles before recording start event (default: 1,000,000)
 
 Returns: `KernelMeasurement`
 
