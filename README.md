@@ -40,6 +40,10 @@ result = benchmark_cuda_event(
 )
 
 print(f"Duration: {result}")
+
+# Expected output:
+#   ampere_sgemm_128x64_nn: 9.2793 ms ± 1.45 μs
+#   Duration: 9.2842 ms ± 1.46 μs
 ```
 
 ## API
