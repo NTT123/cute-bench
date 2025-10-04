@@ -5,7 +5,7 @@ Simple GPU kernel benchmarking with clock locking for stable measurements.
 ## Installation
 
 ```bash
-pip install git+https://github.com/NTT123/cute-bench.git
+pip install -U git+https://github.com/NTT123/cute-bench.git
 ```
 
 ## Usage
