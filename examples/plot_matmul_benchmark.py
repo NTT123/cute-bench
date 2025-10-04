@@ -45,19 +45,12 @@ for n in sizes:
         num_workspaces=num_workspaces,
     )
 
-    # Find sgemm kernel (in case there are multiple kernels)
-    sgemm_kernel = None
-    for kernel_name, measurement in results.items():
-        if 'sgemm' in kernel_name.lower():
-            sgemm_kernel = measurement
-            break
+    # Sum all kernel averages and errors
+    total_avg = sum(measurement.avg for measurement in results.values())
+    total_error = sum(measurement.error for measurement in results.values())
 
-    # Fallback to first kernel if no sgemm found
-    if sgemm_kernel is None:
-        sgemm_kernel = next(iter(results.values()))
-
-    profiler_avgs.append(sgemm_kernel.avg)  # in μs
-    profiler_errors.append(sgemm_kernel.error)  # in μs
+    profiler_avgs.append(total_avg)  # in μs
+    profiler_errors.append(total_error)  # in μs
 
     # Benchmark with CUDA events
     result = benchmark_cuda_event(
@@ -72,7 +65,7 @@ for n in sizes:
     cuda_event_avgs.append(result.avg)  # in μs
     cuda_event_errors.append(result.error)  # in μs
 
-    print(f"  torch.profiler: {sgemm_kernel}")
+    print(f"  torch.profiler: {total_avg:.2f} μs ± {total_error*1000:.2f} ns")
     print(f"  CUDA event:     {result}\n")
 
 # Convert to numpy arrays
