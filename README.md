@@ -15,8 +15,8 @@ import torch
 from cute_bench import benchmark, benchmark_cuda_event
 
 def generate_workspace():
-    a = torch.randn(4096, 4096, device='cuda')
-    b = torch.randn(4096, 4096, device='cuda')
+    a = torch.zeros(4096, 4096, device='cuda')
+    b = torch.zeros(4096, 4096, device='cuda')
     c = torch.zeros(4096, 4096, device='cuda')
     return a, b, c
 
