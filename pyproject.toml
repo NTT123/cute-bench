@@ -19,5 +19,6 @@ packages = ["cute_bench"]
 
 [dependency-groups]
 dev = [
+    "matplotlib>=3.9.4",
     "pytest>=8.4.2",
 ]

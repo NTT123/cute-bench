@@ -52,6 +52,8 @@ print(f"Duration: {result}")
 #   CUDA event      : 31.9   μs ± 1.77 μs
 ```
 
+![Benchmark Results](examples/matmul_benchmark.png)
+
 ## API
 
 ### `benchmark(fn, workspace_generator, **kwargs)`
