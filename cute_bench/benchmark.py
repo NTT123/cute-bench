@@ -114,19 +114,20 @@ def benchmark_cuda_event(fn, workspace_generator, num_warmup_runs=1000,
         workspaces = [workspace_generator() for _ in range(num_workspaces)]
         torch.cuda.synchronize()
 
-        start_event = torch.cuda.Event(enable_timing=True)
-        end_event = torch.cuda.Event(enable_timing=True)
+        start_events = [torch.cuda.Event(enable_timing=True) for _ in range(N)]
+        end_events = [torch.cuda.Event(enable_timing=True) for _ in range(N)]
+
+        for i in range(N):
+            workspace = workspaces[i % num_workspaces]
+            start_events[i].record()
+            fn(*workspace)
+            end_events[i].record()
+
+        torch.cuda.synchronize()
 
         timings = []
         for i in range(N):
-            workspace = workspaces[i % num_workspaces]
-
-            start_event.record()
-            fn(*workspace)
-            end_event.record()
-
-            torch.cuda.synchronize()
-            elapsed_time = start_event.elapsed_time(end_event) * 1000  # ms to μs
+            elapsed_time = start_events[i].elapsed_time(end_events[i]) * 1000  # ms to μs
             timings.append(elapsed_time)
 
         # Only keep active runs
