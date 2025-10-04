@@ -19,7 +19,7 @@ device_name = torch.cuda.get_device_name(0)
 print(f"Device: {device_name}\n")
 
 # Matrix sizes to benchmark
-sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
 # Storage for results
 profiler_avgs = []
@@ -30,18 +30,11 @@ cuda_event_errors = []
 for n in sizes:
     print(f"Benchmarking {n}×{n}×{n}...")
 
-    # Adjust benchmark parameters based on matrix size
-    if n <= 64:
-        num_warmup = 5000
-        num_active = 5000
-    elif n <= 256:
-        num_warmup = 5000
-        num_active = 5000
-    else:
-        num_warmup = 5000
-        num_active = 5000
+    num_warmup = 5000
+    num_active = 5000
 
     workspace_gen = generate_workspace(n)
+    num_workspaces = min(num_warmup + num_active, 200 * (1024 // n) ** 2)
 
     # Benchmark with torch profiler
     results = benchmark(
@@ -49,7 +42,7 @@ for n in sizes:
         workspace_generator=workspace_gen,
         num_warmup_runs=num_warmup,
         num_active_runs=num_active,
-        num_workspaces=2000,
+        num_workspaces=num_workspaces,
     )
 
     # Find sgemm kernel (in case there are multiple kernels)
@@ -63,8 +56,8 @@ for n in sizes:
     if sgemm_kernel is None:
         sgemm_kernel = next(iter(results.values()))
 
-    profiler_avgs.append(sgemm_kernel.avg / 1e3)  # Convert μs to ms
-    profiler_errors.append(sgemm_kernel.error / 1e3)  # Convert μs to ms
+    profiler_avgs.append(sgemm_kernel.avg)  # in μs
+    profiler_errors.append(sgemm_kernel.error)  # in μs
 
     # Benchmark with CUDA events
     result = benchmark_cuda_event(
@@ -72,12 +65,12 @@ for n in sizes:
         workspace_generator=workspace_gen,
         num_warmup_runs=num_warmup,
         num_active_runs=num_active,
-        num_workspaces=1000,
+        num_workspaces=num_workspaces,
         num_blocked_cycles=1_000_000,
     )
 
-    cuda_event_avgs.append(result.avg / 1e3)  # Convert μs to ms
-    cuda_event_errors.append(result.error / 1e3)  # Convert μs to ms
+    cuda_event_avgs.append(result.avg)  # in μs
+    cuda_event_errors.append(result.error)  # in μs
 
     print(f"  torch.profiler: {sgemm_kernel}")
     print(f"  CUDA event:     {result}\n")
@@ -97,11 +90,16 @@ plt.errorbar(sizes, profiler_avgs, yerr=profiler_errors,
 plt.errorbar(sizes, cuda_event_avgs, yerr=cuda_event_errors,
                 marker='s', label='CUDA event', capsize=5, linewidth=2)
 
+plt.xscale('log')
 plt.xlabel('Matrix Size (n×n×n)')
-plt.ylabel('Time (ms)')
+plt.ylabel('Time (μs)')
 plt.title(f'Matrix Multiplication Benchmark - {device_name}')
 plt.legend()
 plt.grid(True, alpha=0.3)
+
+# Custom x-axis ticks
+xtick_values = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+plt.xticks(xtick_values, [str(x) for x in xtick_values])
 
 # Save plot
 plt.savefig('matmul_benchmark.png', dpi=150, bbox_inches='tight')
