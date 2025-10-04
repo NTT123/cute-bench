@@ -39,7 +39,7 @@ avg, error = benchmark_cuda_event(
     num_active_runs=100,
 )
 
-print(f"Duration: {avg/1e3:.5f} ms ± {error:.2f} ¼s")
+print(f"Duration: {avg/1e3:.5f} ms Â± {error:.2f} us")
 ```
 
 ## API
@@ -70,9 +70,9 @@ Returns: `tuple[float, float]` - (avg_time_us, error_us)
 
 Stores kernel timing measurements.
 
-- `timings`: Array of timing measurements (¼s)
-- `avg`: Average timing (¼s)
-- `error`: Mean absolute error (¼s)
+- `timings`: Array of timing measurements (us)
+- `avg`: Average timing (us)
+- `error`: Mean absolute error (us)
 
 ### `GPUClockLocker`
 
