@@ -40,6 +40,61 @@ class KernelMeasurement:
         self.avg = np.mean(self.timings)
         self.error = np.mean(np.abs(self.timings - self.avg))
 
+    def _format_time(self, value_us):
+        """Format time value with appropriate unit.
+
+        Args:
+            value_us: Time value in microseconds
+
+        Returns:
+            tuple: (scaled_value, unit_string)
+        """
+        if value_us >= 1e6:  # >= 1 second
+            return value_us / 1e6, "s"
+        elif value_us >= 1e3:  # >= 1 millisecond
+            return value_us / 1e3, "ms"
+        elif value_us >= 1:  # >= 1 microsecond
+            return value_us, "μs"
+        else:  # < 1 microsecond (nanoseconds)
+            return value_us * 1e3, "ns"
+
+    def __str__(self):
+        """Format as 'X.XX unit ± Y.YY unit' with smart precision."""
+        avg_val, avg_unit = self._format_time(self.avg)
+        err_val, err_unit = self._format_time(self.error)
+
+        # Calculate how many decimal places needed for avg based on error magnitude
+        # Convert error to avg's unit for comparison
+        unit_scales = {"s": 1e6, "ms": 1e3, "μs": 1, "ns": 1e-3}
+        err_in_avg_unit = self.error / unit_scales[avg_unit]
+
+        # Determine precision: we want the last digit of avg to be at the same
+        # magnitude as the error or smaller
+        if err_in_avg_unit > 0:
+            # log10(err) tells us the order of magnitude
+            # We want avg to have decimals down to at least that level
+            err_magnitude = np.floor(np.log10(err_in_avg_unit))
+            # Number of decimals = -err_magnitude (but at least 0)
+            decimals_needed = max(0, int(-err_magnitude) + 1)
+        else:
+            decimals_needed = 1
+
+        # Cap at reasonable maximum
+        decimals_needed = min(decimals_needed, 6)
+
+        # Format error with 2-3 significant figures
+        if err_val >= 100:
+            err_decimals = 0
+        elif err_val >= 10:
+            err_decimals = 1
+        else:
+            err_decimals = 2
+
+        avg_str = f"{avg_val:.{decimals_needed}f}"
+        err_str = f"{err_val:.{err_decimals}f}"
+
+        return f"{avg_str} {avg_unit} ± {err_str} {err_unit}"
+
     def __repr__(self):
         return f"KernelMeasurement(avg={self.avg/1e3:.5f}ms, error={self.error:.2f}μs)"
 
