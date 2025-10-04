@@ -31,15 +31,15 @@ results = benchmark(
 for kernel_name, measurement in results.items():
     print(f"{kernel_name}: {measurement}")
 
-# Benchmark with CUDA events (returns single avg, error tuple)
-avg, error = benchmark_cuda_event(
+# Benchmark with CUDA events (returns KernelMeasurement)
+result = benchmark_cuda_event(
     fn=lambda a, b, c: torch.matmul(a, b, out=c),
     workspace_generator=generate_workspace,
     num_warmup_runs=1000,
     num_active_runs=100,
 )
 
-print(f"Duration: {avg/1e3:.5f} ms ± {error:.2f} μs")
+print(f"Duration: {result.avg/1e3:.5f} ms ± {result.error:.2f} μs")
 ```
 
 ## API
@@ -64,7 +64,7 @@ Benchmark using torch.cuda.Event. Returns single timing measurement.
 
 Same parameters as `benchmark()`.
 
-Returns: `tuple[float, float]` - (avg_time_us, error_us)
+Returns: `KernelMeasurement`
 
 ### `KernelMeasurement`
 

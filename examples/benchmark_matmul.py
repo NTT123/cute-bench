@@ -29,7 +29,7 @@ if __name__ == "__main__":
         print(f"  {kernel_name}: {measurement.avg/1e3:.5f} ms ± {measurement.error:.2f} μs")
 
     # Benchmark with cuda events
-    avg, error = benchmark_cuda_event(
+    result = benchmark_cuda_event(
         fn=lambda a, b, c: torch.matmul(a, b, out=c),
         workspace_generator=generate_workspace,
         num_warmup_runs=1000,
@@ -38,4 +38,4 @@ if __name__ == "__main__":
     )
 
     print(f"\nCUDA Event result:")
-    print(f"  {avg/1e3:.5f} ms ± {error:.2f} μs")
+    print(f"  {result.avg/1e3:.5f} ms ± {result.error:.2f} μs")

@@ -107,7 +107,7 @@ def benchmark_cuda_event(fn, workspace_generator, num_warmup_runs=1000,
         device_index: GPU device index
 
     Returns:
-        tuple[float, float]: (avg_time_us, error_us)
+        KernelMeasurement: Timing measurements
     """
     with GPUClockLocker(device_index, enabled=lock_clocks):
         N = num_warmup_runs + num_active_runs
@@ -131,8 +131,5 @@ def benchmark_cuda_event(fn, workspace_generator, num_warmup_runs=1000,
             timings.append(elapsed_time)
 
         # Only keep active runs
-        timings = np.array(timings[-num_active_runs:])
-        avg = np.mean(timings)
-        error = np.mean(np.abs(timings - avg))
-
-        return avg, error
+        active_timings = timings[-num_active_runs:]
+        return KernelMeasurement(active_timings)
