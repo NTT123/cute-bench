@@ -28,6 +28,7 @@ class GPUClockLocker:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if not self.enabled:
             return False
+        pynvml.nvmlDeviceResetGpuLockedClocks(self.handle)
         pynvml.nvmlShutdown()
         return False
 
